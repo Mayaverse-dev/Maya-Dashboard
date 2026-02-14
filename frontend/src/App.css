@@ -1,0 +1,363 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  width: min(1100px, calc(100vw - 40px));
+  margin: 0 auto;
+}
+
+/* Decorative glow blobs */
+.blob {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(222, 1, 54, 0.35), transparent 60%);
+  filter: blur(2px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.blob.a {
+  top: -240px;
+  left: -220px;
+}
+
+.blob.b {
+  bottom: -280px;
+  right: -260px;
+  opacity: 0.55;
+}
+
+.blob.c {
+  top: 35%;
+  right: -320px;
+  width: 620px;
+  height: 620px;
+  opacity: 0.35;
+}
+
+.topQuote {
+  padding: 26px 0 6px;
+  text-align: center;
+  opacity: 0.95;
+}
+
+.topQuote p {
+  margin: 0 auto;
+  max-width: 760px;
+  font-size: 1.05rem;
+  color: rgba(250, 248, 216, 0.88);
+}
+
+.centerStage {
+  min-height: calc(100vh - 140px);
+  display: grid;
+  place-items: center;
+  padding: 24px 0 38px;
+}
+
+.enterTitle {
+  font-size: clamp(52px, 10vw, 120px);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin: 0 0 18px;
+  text-transform: uppercase;
+  color: var(--maya-cream);
+}
+
+.logoMark {
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 18px;
+  filter: drop-shadow(0 0 30px rgba(222, 1, 54, 0.38));
+}
+
+.card {
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.loginCard {
+  width: min(560px, calc(100vw - 40px));
+  text-align: center;
+}
+
+.loginRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.passwordInput {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 1rem;
+}
+
+.btn {
+  border-radius: 14px;
+  border: 1px solid rgba(250, 248, 216, 0.12);
+  padding: 13px 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: rgba(250, 248, 216, 0.06);
+  color: var(--maya-light);
+  cursor: pointer;
+  transition: transform 120ms ease, background 200ms ease, border-color 200ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(222, 1, 54, 0.35);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnPrimary {
+  border-color: rgba(222, 1, 54, 0.45);
+  background: linear-gradient(180deg, rgba(222, 1, 54, 0.28), rgba(222, 1, 54, 0.14));
+}
+
+.errorBox {
+  margin-top: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(222, 1, 54, 0.35);
+  background: rgba(222, 1, 54, 0.12);
+  padding: 12px 14px;
+  text-align: left;
+  color: rgba(250, 248, 216, 0.92);
+}
+
+.subtle {
+  opacity: 0.75;
+  font-size: 0.95rem;
+}
+
+/* Authed view */
+.headerBar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(18px);
+  background: rgba(34, 29, 30, 0.65);
+  border-bottom: 1px solid rgba(250, 248, 216, 0.08);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(222, 1, 54, 0.35);
+  background: rgba(222, 1, 54, 0.12);
+  color: var(--maya-cream);
+}
+
+.content {
+  padding: 22px 0 56px;
+}
+
+.toolGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.toolCard {
+  border-radius: 18px;
+  padding: 18px;
+  min-height: 120px;
+  display: grid;
+  gap: 8px;
+}
+
+.appCardLink {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 140ms ease;
+}
+
+.appCardLink:hover {
+  transform: translateY(-2px);
+}
+
+.appCardLink[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toolTitle {
+  font-size: 1.05rem;
+  font-weight: 750;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolDesc {
+  opacity: 0.78;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(250, 248, 216, 0.12);
+  background: rgba(250, 248, 216, 0.06);
+  color: rgba(250, 248, 216, 0.9);
+}
+
+.appMeta {
+  margin-top: 4px;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.metricTile {
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid rgba(250, 248, 216, 0.1);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.metricLabel {
+  opacity: 0.78;
+  font-size: 0.92rem;
+}
+
+.metricValue {
+  margin-top: 8px;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.footer {
+  padding: 22px 0 34px;
+  text-align: center;
+  opacity: 0.72;
+  font-size: 0.95rem;
+}
+
+/* eBook stats page */
+.ebookPage {
+  display: grid;
+  gap: 14px;
+}
+
+.ebookHeader {
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ebookHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ebookHeaderMeta {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ebookHeaderTitle {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.ebookHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ebookGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.ebookSection {
+  display: grid;
+  gap: 10px;
+}
+
+.ebookSectionTitle {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.ebookList {
+  display: grid;
+  gap: 8px;
+}
+
+.ebookRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(250, 248, 216, 0.08);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.ebookLabel {
+  opacity: 0.9;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ebookCount {
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--maya-cream);
+}

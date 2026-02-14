@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --maya-red: #de0136;
+  --maya-dark: #221d1e;
+  --maya-light: #faf8d8;
+  --maya-cream: #f5f2d0;
+
+  color-scheme: dark;
+  font-family: "DM Sans", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--maya-light);
+  background-color: var(--maya-dark);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--maya-dark);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Noise texture overlay (matches reference aesthetic). */
+.noiseOverlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  z-index: 100;
+}
+
+.bgMayaGradient {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(222, 1, 54, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(222, 1, 54, 0.08), transparent),
+    var(--maya-dark);
+}
+
+.quoteText {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+.textGlow {
+  text-shadow: 0 0 40px rgba(222, 1, 54, 0.45);
+}
+
+.glassCard {
+  background: rgba(250, 248, 216, 0.03);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(250, 248, 216, 0.08);
+}
+
+.glassCard:hover {
+  background: rgba(250, 248, 216, 0.06);
+  border-color: rgba(222, 1, 54, 0.28);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 40px rgba(222, 1, 54, 0.1);
+}
+
+.inputDark {
+  background: rgba(250, 248, 216, 0.05);
+  border: 1px solid rgba(250, 248, 216, 0.1);
+  color: var(--maya-light);
+}
+
+.inputDark::placeholder {
+  color: rgba(250, 248, 216, 0.3);
+}
+
+.inputDark:focus {
+  background: rgba(250, 248, 216, 0.08);
+  border-color: rgba(222, 1, 54, 0.5);
+  outline: none;
+  box-shadow: 0 0 20px rgba(222, 1, 54, 0.2);
+}
+
+::selection {
+  background: rgba(222, 1, 54, 0.4);
+  color: var(--maya-light);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(250, 248, 216, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(250, 248, 216, 0.25);
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animateFloat {
+  animation: floatY 6s ease-in-out infinite;
+}
+
+.animateFadeInUp {
+  animation: fadeInUp 0.7s ease-out both;
+}
