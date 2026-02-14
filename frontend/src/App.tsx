@@ -1,5 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
+import { ArrowLeft, LogOut, RefreshCw } from 'lucide-react'
 import EbookStats from './pages/EbookStats'
+import mayaLogo from './assets/maya.webp'
+import ebookCardBg from './assets/Memory of Water.png'
 import './App.css'
 
 type VerifyResponse = {
@@ -25,6 +28,7 @@ type InternalCard = {
   description: string
   path: string
   badge?: string
+  backgroundSrc?: string
 }
 
 type ExternalCard = {
@@ -33,6 +37,7 @@ type ExternalCard = {
   description: string
   subdomain: string
   badge?: string
+  backgroundSrc?: string
 }
 
 type CardSpec = InternalCard | ExternalCard
@@ -56,30 +61,24 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
-function formatExp(exp?: number) {
-  if (!exp) return 'n/a'
-  try {
-    return new Date(exp * 1000).toLocaleString()
-  } catch {
-    return 'n/a'
-  }
-}
-
 function App() {
   const [auth, setAuth] = useState<'checking' | 'authed' | 'not_authed'>('checking')
-  const [session, setSession] = useState<VerifyResponse | null>(null)
+  const [_session, setSession] = useState<VerifyResponse | null>(null)
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname)
+  const [ebookRefreshSeq, setEbookRefreshSeq] = useState(0)
+  const [ebookSyncing, setEbookSyncing] = useState(false)
 
   const cards: CardSpec[] = [
     {
       kind: 'internal',
       title: 'eBook Stats',
-      description: 'Downloads, formats, event types, and top countries.',
+      description: 'Visits and downloads, grouped by user + format.',
       path: '/ebook',
       badge: 'Metrics',
+      backgroundSrc: ebookCardBg,
     },
     // External cards will be added later.
   ]
@@ -169,21 +168,7 @@ function App() {
               <h1 className="enterTitle textGlow">ENTER</h1>
 
               <div className="logoMark" aria-hidden="true">
-                <svg viewBox="0 0 96 96" width="86" height="86" role="img" aria-label="Maya">
-                  <defs>
-                    <radialGradient id="rg" cx="30%" cy="30%" r="80%">
-                      <stop offset="0%" stopColor="rgba(222,1,54,0.55)" />
-                      <stop offset="55%" stopColor="rgba(222,1,54,0.18)" />
-                      <stop offset="100%" stopColor="rgba(222,1,54,0)" />
-                    </radialGradient>
-                  </defs>
-                  <circle cx="48" cy="48" r="40" fill="rgba(250,248,216,0.04)" stroke="rgba(250,248,216,0.12)" />
-                  <circle cx="48" cy="48" r="40" fill="url(#rg)" />
-                  <path
-                    d="M28 62V34h6.6l12.2 15.7L59 34H66v28h-6.8V45.2L46.8 60.8 34.7 45.3V62H28z"
-                    fill="rgba(250,248,216,0.92)"
-                  />
-                </svg>
+                <img className="logoImg" src={mayaLogo} alt="" />
               </div>
 
               <div className="subtle">Enter the shared password to view metrics.</div>
@@ -209,20 +194,41 @@ function App() {
             </div>
           </div>
 
-          <div className="footer">Maya Narrative Universe</div>
+          <div className="footer" aria-hidden="true">
+            <img className="footerLogo" src={mayaLogo} alt="" />
+          </div>
         </div>
       ) : (
         <>
           <div className="headerBar">
             <div className="container headerInner">
               <div className="headerTitle">
+                <img className="headerLogo" src={mayaLogo} alt="" aria-hidden="true" />
                 {isEbookPage ? 'eBook Stats' : 'Tools'}{' '}
                 <span className="badge">{isEbookPage ? 'ebook' : 'directory'}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className="subtle">Session expires: {formatExp(session?.exp)}</div>
-                <button className="btn" onClick={onLogout} disabled={busy}>
-                  Logout
+              <div className="navActions">
+                {isEbookPage ? (
+                  <>
+                    <button className="btn iconBtn" type="button" onClick={() => navigate('/')} aria-label="Back">
+                      <ArrowLeft size={18} />
+                    </button>
+                    <button
+                      className="btn iconBtn"
+                      type="button"
+                      onClick={() => {
+                        setEbookSyncing(true)
+                        setEbookRefreshSeq((n) => n + 1)
+                      }}
+                      disabled={ebookSyncing}
+                      aria-label="Sync"
+                    >
+                      <RefreshCw size={18} className={ebookSyncing ? 'spin' : ''} />
+                    </button>
+                  </>
+                ) : null}
+                <button className="btn iconBtn" type="button" onClick={onLogout} disabled={busy} aria-label="Logout">
+                  <LogOut size={18} />
                 </button>
               </div>
             </div>
@@ -232,16 +238,23 @@ function App() {
             {error ? <div className="errorBox">{error}</div> : null}
 
             {isEbookPage ? (
-              <EbookStats onBack={() => navigate('/')} />
+              <EbookStats
+                refreshSeq={ebookRefreshSeq}
+                onRefreshComplete={() => setEbookSyncing(false)}
+              />
             ) : (
               <div className="toolGrid">
                 {cards.map((card) => {
                   if (card.kind === 'internal') {
+                    const style: CSSProperties | undefined = card.backgroundSrc
+                      ? ({ ['--card-bg' as any]: `url(${card.backgroundSrc})` } as CSSProperties)
+                      : undefined
                     return (
                       <a
                         key={card.path}
-                        className="toolCard glassCard appCardLink"
+                        className={`toolCard glassCard appCardLink${card.backgroundSrc ? ' cardHasBg' : ''}`}
                         href={card.path}
+                        style={style}
                         onClick={(e) => {
                           e.preventDefault()
                           navigate(card.path)
@@ -259,14 +272,18 @@ function App() {
                   const suffix = deriveServiceSuffix()
                   const href = suffix ? `https://${card.subdomain}.${suffix}` : '#'
                   const disabled = !suffix
+                  const style: CSSProperties | undefined = card.backgroundSrc
+                    ? ({ ['--card-bg' as any]: `url(${card.backgroundSrc})` } as CSSProperties)
+                    : undefined
                   return (
                     <a
                       key={card.subdomain}
-                      className="toolCard glassCard appCardLink"
+                      className={`toolCard glassCard appCardLink${card.backgroundSrc ? ' cardHasBg' : ''}`}
                       href={href}
                       target={disabled ? undefined : '_blank'}
                       rel={disabled ? undefined : 'noreferrer'}
                       aria-disabled={disabled}
+                      style={style}
                       onClick={(e) => {
                         if (disabled) e.preventDefault()
                       }}
@@ -284,7 +301,9 @@ function App() {
               </div>
             )}
 
-            <div className="footer">Maya Narrative Universe</div>
+            <div className="footer" aria-hidden="true">
+              <img className="footerLogo" src={mayaLogo} alt="" />
+            </div>
           </div>
         </>
       )}

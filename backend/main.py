@@ -183,44 +183,74 @@ def _where_days(days: int) -> Tuple[str, list[Any]]:
 
 
 def _ebook_stats_payload(days: int) -> Dict[str, Any]:
-    # Guardrails
     if days > 3650:
         days = 3650
 
     where_sql, params = _where_days(days)
 
     try:
-        by_format = db.fetch_all(
+        # User summary: how many unique users visited (page_view),
+        # downloaded pdf, downloaded epub, downloaded both.
+        user_summary = db.fetch_all(
             f"""
-            SELECT e."format" AS format, COUNT(*)::bigint AS count
-            FROM ebook.download_events e
-            {where_sql}
-            GROUP BY 1
-            ORDER BY count DESC
+            WITH scoped AS (
+                SELECT e.user_id, e.event_type, e."format"
+                FROM ebook.download_events e
+                {where_sql}
+            ),
+            per_user AS (
+                SELECT
+                    user_id,
+                    BOOL_OR(event_type = 'page_view') AS visited,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub
+                FROM scoped
+                GROUP BY user_id
+            )
+            SELECT
+                COUNT(*) FILTER (WHERE visited)::bigint AS visited,
+                COUNT(*) FILTER (WHERE dl_pdf)::bigint AS pdf,
+                COUNT(*) FILTER (WHERE dl_epub)::bigint AS epub,
+                COUNT(*) FILTER (WHERE dl_pdf AND dl_epub)::bigint AS both,
+                COUNT(*) FILTER (WHERE dl_pdf AND NOT dl_epub)::bigint AS pdf_only,
+                COUNT(*) FILTER (WHERE dl_epub AND NOT dl_pdf)::bigint AS epub_only
+            FROM per_user
             """,
             params,
         )
-        by_event_type = db.fetch_all(
+
+        # User list with details cross-referenced from public.users.
+        users = db.fetch_all(
             f"""
-            SELECT e.event_type AS event_type, COUNT(*)::bigint AS count
-            FROM ebook.download_events e
-            {where_sql}
-            GROUP BY 1
-            ORDER BY count DESC
+            WITH scoped AS (
+                SELECT e.user_id, e.event_type, e."format"
+                FROM ebook.download_events e
+                {where_sql}
+            ),
+            per_user AS (
+                SELECT
+                    user_id,
+                    BOOL_OR(event_type = 'page_view') AS visited,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub
+                FROM scoped
+                GROUP BY user_id
+            )
+            SELECT
+                u.id,
+                u.email,
+                COALESCE(u.backer_name, '') AS name,
+                COALESCE(u.reward_title, '') AS reward_title,
+                p.visited,
+                p.dl_pdf,
+                p.dl_epub
+            FROM per_user p
+            JOIN public.users u ON u.id = p.user_id
+            ORDER BY u.id
             """,
             params,
         )
-        top_countries = db.fetch_all(
-            f"""
-            SELECT COALESCE(NULLIF(e.country, ''), 'unknown') AS country, COUNT(*)::bigint AS count
-            FROM ebook.download_events e
-            {where_sql}
-            GROUP BY 1
-            ORDER BY count DESC
-            LIMIT 12
-            """,
-            params,
-        )
+
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Database query failed") from exc
 
@@ -228,15 +258,21 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
         "ok": True,
         "generated_at": _now_iso(),
         "window_days": days,
-        "by_format": by_format,
-        "by_event_type": by_event_type,
-        "top_countries": top_countries,
+        "user_summary": user_summary[0] if user_summary else {
+            "visited": 0,
+            "pdf": 0,
+            "epub": 0,
+            "both": 0,
+            "pdf_only": 0,
+            "epub_only": 0,
+        },
+        "users": users,
     }
 
 
 @app.get("/api/ebook/stats")
 def ebook_stats(days: int = 30, payload: Dict[str, Any] = Depends(verify_maya_auth)) -> Dict[str, Any]:
-    _ = payload  # reserved for future per-user scoping
+    _ = payload
     return _ebook_stats_payload(days)
 
 
