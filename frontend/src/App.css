@@ -512,3 +512,157 @@
 .no {
   opacity: 0.3;
 }
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 640px) {
+  .container {
+    width: calc(100vw - 32px);
+  }
+
+  /* Login */
+  .loginPage {
+    padding: 32px 16px;
+  }
+
+  .logoMark {
+    margin: 12px 0 32px;
+  }
+
+  .loginInputGroup {
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .loginInput {
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  .loginBtn {
+    width: 100%;
+    padding: 14px 24px;
+  }
+
+  .loginFooter {
+    bottom: 24px;
+  }
+
+  /* Header */
+  .pageHeader {
+    padding: 24px 0 16px;
+  }
+
+  .headerLogo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .headerTitle {
+    font-size: clamp(32px, 9vw, 48px);
+  }
+
+  .iconBtn {
+    padding: 10px;
+  }
+
+  /* Content */
+  .content {
+    padding: 0 0 48px;
+  }
+
+  /* Cards */
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appCard {
+    min-height: 100px;
+    padding: 18px;
+  }
+
+  /* Stats */
+  .statRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .statTile {
+    padding: 16px 12px;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .statLabel {
+    font-size: 0.75rem;
+  }
+
+  /* Section */
+  .card {
+    padding: 16px;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .chipRow {
+    width: 100%;
+  }
+
+  .chipBtn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  /* User table - horizontal scroll */
+  .userTable {
+    overflow-x: auto;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 0 16px;
+  }
+
+  .userTableHead,
+  .userTableRow {
+    min-width: 560px;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  /* Footer */
+  .pageFooter {
+    padding: 24px 0;
+  }
+
+  .footerLogo {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+  .statRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .headerTitle {
+    font-size: 28px;
+  }
+
+  .chipBtn {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+}
