@@ -203,7 +203,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                     user_id,
                     BOOL_OR(event_type = 'page_view') AS visited,
                     BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf,
-                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub,
+                    BOOL_OR(event_type = 'send_to_kindle_click') AS dl_kindle
                 FROM scoped
                 GROUP BY user_id
             )
@@ -213,7 +214,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                 COUNT(*) FILTER (WHERE dl_epub)::bigint AS epub,
                 COUNT(*) FILTER (WHERE dl_pdf AND dl_epub)::bigint AS both,
                 COUNT(*) FILTER (WHERE dl_pdf AND NOT dl_epub)::bigint AS pdf_only,
-                COUNT(*) FILTER (WHERE dl_epub AND NOT dl_pdf)::bigint AS epub_only
+                COUNT(*) FILTER (WHERE dl_epub AND NOT dl_pdf)::bigint AS epub_only,
+                COUNT(*) FILTER (WHERE dl_kindle)::bigint AS kindle
             FROM per_user
             """,
             params,
@@ -232,7 +234,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                     user_id,
                     BOOL_OR(event_type = 'page_view') AS visited,
                     BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf,
-                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub,
+                    BOOL_OR(event_type = 'send_to_kindle_click') AS dl_kindle
                 FROM scoped
                 GROUP BY user_id
             )
@@ -243,7 +246,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                 COALESCE(u.reward_title, '') AS reward_title,
                 p.visited,
                 p.dl_pdf,
-                p.dl_epub
+                p.dl_epub,
+                p.dl_kindle
             FROM per_user p
             JOIN public.users u ON u.id = p.user_id
             ORDER BY u.id
@@ -265,6 +269,7 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
             "both": 0,
             "pdf_only": 0,
             "epub_only": 0,
+            "kindle": 0,
         },
         "users": users,
     }

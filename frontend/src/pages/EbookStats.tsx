@@ -7,6 +7,7 @@ type UserSummary = {
   both: number
   pdf_only: number
   epub_only: number
+  kindle: number
 }
 
 type UserRow = {
@@ -17,6 +18,7 @@ type UserRow = {
   visited: boolean
   dl_pdf: boolean
   dl_epub: boolean
+  dl_kindle: boolean
 }
 
 type EbookStatsResponse = {
@@ -54,7 +56,7 @@ function formatTs(ts?: string) {
   }
 }
 
-type Filter = 'all' | 'visited' | 'pdf' | 'epub' | 'both'
+type Filter = 'all' | 'visited' | 'pdf' | 'epub' | 'both' | 'kindle'
 
 export default function EbookStats({
   refreshSeq,
@@ -129,6 +131,7 @@ export default function EbookStats({
     if (filter === 'pdf' && !u.dl_pdf) return false
     if (filter === 'epub' && !u.dl_epub) return false
     if (filter === 'both' && !(u.dl_pdf && u.dl_epub)) return false
+    if (filter === 'kindle' && !u.dl_kindle) return false
     // Filter by search
     if (searchLower) {
       const matchEmail = u.email.toLowerCase().includes(searchLower)
@@ -172,6 +175,10 @@ export default function EbookStats({
               <div className="statValue">{s?.both ?? 0}</div>
               <div className="statLabel">Both</div>
             </button>
+            <button className="statTile glassCard statBtn" type="button" onClick={() => onTileClick('kindle')}>
+              <div className="statValue">{s?.kindle ?? 0}</div>
+              <div className="statLabel">Kindle</div>
+            </button>
           </div>
 
           {/* Users section */}
@@ -197,6 +204,9 @@ export default function EbookStats({
                 <button className={`chipBtn${filter === 'both' ? ' active' : ''}`} type="button" onClick={() => setFilter('both')}>
                   Both
                 </button>
+                <button className={`chipBtn${filter === 'kindle' ? ' active' : ''}`} type="button" onClick={() => setFilter('kindle')}>
+                  Kindle
+                </button>
               </div>
             </div>
 
@@ -218,6 +228,7 @@ export default function EbookStats({
                   <span>Visited</span>
                   <span>PDF</span>
                   <span>ePub</span>
+                  <span>Kindle</span>
                 </div>
                 {filteredUsers.map((u) => (
                   <div key={u.id} className="userTableRow">
@@ -226,6 +237,7 @@ export default function EbookStats({
                     <span className={u.visited ? 'yes' : 'no'}>{u.visited ? 'Yes' : '-'}</span>
                     <span className={u.dl_pdf ? 'yes' : 'no'}>{u.dl_pdf ? 'Yes' : '-'}</span>
                     <span className={u.dl_epub ? 'yes' : 'no'}>{u.dl_epub ? 'Yes' : '-'}</span>
+                    <span className={u.dl_kindle ? 'yes' : 'no'}>{u.dl_kindle ? 'Yes' : '-'}</span>
                   </div>
                 ))}
               </div>
