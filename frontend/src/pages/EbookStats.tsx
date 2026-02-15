@@ -68,8 +68,8 @@ export default function EbookStats({
   const [data, setData] = useState<EbookStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showUsers, setShowUsers] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
+  const [search, setSearch] = useState('')
 
   async function fetchStats(method: 'GET' | 'POST') {
     setError(null)
@@ -122,17 +122,24 @@ export default function EbookStats({
 
   const s = data?.user_summary
 
+  const searchLower = search.toLowerCase().trim()
   const filteredUsers = (data?.users ?? []).filter((u) => {
-    if (filter === 'all') return true
-    if (filter === 'visited') return u.visited
-    if (filter === 'pdf') return u.dl_pdf
-    if (filter === 'epub') return u.dl_epub
-    return u.dl_pdf && u.dl_epub
+    // Filter by category
+    if (filter === 'visited' && !u.visited) return false
+    if (filter === 'pdf' && !u.dl_pdf) return false
+    if (filter === 'epub' && !u.dl_epub) return false
+    if (filter === 'both' && !(u.dl_pdf && u.dl_epub)) return false
+    // Filter by search
+    if (searchLower) {
+      const matchEmail = u.email.toLowerCase().includes(searchLower)
+      const matchName = u.name.toLowerCase().includes(searchLower)
+      if (!matchEmail && !matchName) return false
+    }
+    return true
   })
 
   function onTileClick(next: Filter) {
     setFilter(next)
-    setShowUsers(true)
   }
 
   return (
@@ -190,13 +197,20 @@ export default function EbookStats({
                 <button className={`chipBtn${filter === 'both' ? ' active' : ''}`} type="button" onClick={() => setFilter('both')}>
                   Both
                 </button>
-                <button className="btn" type="button" onClick={() => setShowUsers((p) => !p)}>
-                  {showUsers ? 'Hide' : 'Show'}
-                </button>
               </div>
             </div>
 
-            {showUsers && filteredUsers.length > 0 ? (
+            <div className="searchRow">
+              <input
+                className="searchInput inputDark"
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by email or name..."
+              />
+            </div>
+
+            {filteredUsers.length > 0 ? (
               <div className="userTable">
                 <div className="userTableHead">
                   <span>Email</span>
@@ -215,11 +229,9 @@ export default function EbookStats({
                   </div>
                 ))}
               </div>
-            ) : null}
-
-            {showUsers && filteredUsers.length === 0 ? (
-              <div className="subtle">No users found in this window.</div>
-            ) : null}
+            ) : (
+              <div className="subtle" style={{ marginTop: 12 }}>No users found.</div>
+            )}
           </div>
         </>
       )}

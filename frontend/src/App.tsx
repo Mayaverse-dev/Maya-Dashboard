@@ -75,12 +75,10 @@ function App() {
     {
       kind: 'internal',
       title: 'eBook Stats',
-      description: 'Visits and downloads, grouped by user + format.',
+      description: '',
       path: '/ebook',
-      badge: 'Metrics',
       backgroundSrc: ebookCardBg,
     },
-    // External cards will be added later.
   ]
 
   useEffect(() => {
@@ -162,50 +160,41 @@ function App() {
       <div className="blob c animateFloat" aria-hidden="true" />
 
       {auth !== 'authed' ? (
-        <div className="container">
-          <div className="centerStage">
-            <div className="loginCard glassCard card animateFadeInUp">
-              <h1 className="enterTitle textGlow">ENTER</h1>
-
-              <div className="logoMark" aria-hidden="true">
-                <img className="logoImg" src={mayaLogo} alt="" />
-              </div>
-
-              <div className="subtle">Enter the shared password to view metrics.</div>
-
-              <form onSubmit={onLogin}>
-                <div className="loginRow">
-                  <input
-                    className="passwordInput inputDark"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    autoFocus
-                  />
-                  <button className="btn btnPrimary" type="submit" disabled={busy || password.trim().length === 0}>
-                    {busy ? '...' : 'Enter'}
-                  </button>
-                </div>
-
-                {auth === 'checking' ? <div className="subtle" style={{ marginTop: 12 }}>Checking session...</div> : null}
-                {error ? <div className="errorBox">{error}</div> : null}
-              </form>
+        <div className="loginPage">
+          <div className="loginCenter">
+            <h1 className="enterTitle textGlow animateFadeInUp">ENTER</h1>
+            <div className="logoMark animateFadeInUp" aria-hidden="true">
+              <img className="logoImg" src={mayaLogo} alt="" />
             </div>
+            <form className="loginForm animateFadeInUp" onSubmit={onLogin}>
+              <div className="loginInputGroup">
+                <input
+                  className="loginInput"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  autoFocus
+                />
+                <button className="loginBtn" type="submit" disabled={busy || password.trim().length === 0}>
+                  {busy ? '...' : 'Enter'}
+                </button>
+              </div>
+            </form>
+            {auth === 'checking' ? <div className="subtle loginStatus">Checking session...</div> : null}
+            {error ? <div className="errorBox loginError">{error}</div> : null}
           </div>
-
-          <div className="footer" aria-hidden="true">
+          <div className="loginFooter" aria-hidden="true">
             <img className="footerLogo" src={mayaLogo} alt="" />
           </div>
         </div>
       ) : (
         <>
-          <div className="headerBar">
+          <header className="pageHeader">
             <div className="container headerInner">
-              <div className="headerTitle">
+              <div className="headerBrand">
                 <img className="headerLogo" src={mayaLogo} alt="" aria-hidden="true" />
-                {isEbookPage ? 'eBook Stats' : 'Tools'}{' '}
-                <span className="badge">{isEbookPage ? 'ebook' : 'directory'}</span>
+                <span className="headerTitle">{isEbookPage ? 'eBook Stats' : 'Metrics'}</span>
               </div>
               <div className="navActions">
                 {isEbookPage ? (
@@ -232,7 +221,7 @@ function App() {
                 </button>
               </div>
             </div>
-          </div>
+          </header>
 
           <div className="container content">
             {error ? <div className="errorBox">{error}</div> : null}
@@ -243,7 +232,7 @@ function App() {
                 onRefreshComplete={() => setEbookSyncing(false)}
               />
             ) : (
-              <div className="toolGrid">
+              <div className="cardGrid">
                 {cards.map((card) => {
                   if (card.kind === 'internal') {
                     const style: CSSProperties | undefined = card.backgroundSrc
@@ -252,7 +241,7 @@ function App() {
                     return (
                       <a
                         key={card.path}
-                        className={`toolCard glassCard appCardLink${card.backgroundSrc ? ' cardHasBg' : ''}`}
+                        className={`appCard glassCard${card.backgroundSrc ? ' cardHasBg' : ''}`}
                         href={card.path}
                         style={style}
                         onClick={(e) => {
@@ -260,11 +249,7 @@ function App() {
                           navigate(card.path)
                         }}
                       >
-                        <div className="toolTitle">
-                          {card.title} {card.badge ? <span className="pill">{card.badge}</span> : null}
-                        </div>
-                        <div className="toolDesc">{card.description}</div>
-                        <div className="subtle appMeta">{card.path}</div>
+                        <span className="cardTitle">{card.title}</span>
                       </a>
                     )
                   }
@@ -278,7 +263,7 @@ function App() {
                   return (
                     <a
                       key={card.subdomain}
-                      className={`toolCard glassCard appCardLink${card.backgroundSrc ? ' cardHasBg' : ''}`}
+                      className={`appCard glassCard${card.backgroundSrc ? ' cardHasBg' : ''}`}
                       href={href}
                       target={disabled ? undefined : '_blank'}
                       rel={disabled ? undefined : 'noreferrer'}
@@ -288,23 +273,17 @@ function App() {
                         if (disabled) e.preventDefault()
                       }}
                     >
-                      <div className="toolTitle">
-                        {card.title} {card.badge ? <span className="pill">{card.badge}</span> : null}
-                      </div>
-                      <div className="toolDesc">{card.description}</div>
-                      <div className="subtle appMeta">
-                        {suffix ? `${card.subdomain}.${suffix}` : 'Configure a real domain to enable links'}
-                      </div>
+                      <span className="cardTitle">{card.title}</span>
                     </a>
                   )
                 })}
               </div>
             )}
 
-            <div className="footer" aria-hidden="true">
-              <img className="footerLogo" src={mayaLogo} alt="" />
-            </div>
           </div>
+          <footer className="pageFooter" aria-hidden="true">
+            <img className="footerLogo" src={mayaLogo} alt="" />
+          </footer>
         </>
       )}
     </div>
