@@ -582,23 +582,24 @@
     padding: 18px;
   }
 
-  /* Stats - 3 columns on mobile, wrapping */
+  /* Stats - 5 columns on mobile to fit all */
   .statRow {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
   }
 
   .statTile {
-    padding: 14px 8px;
+    padding: 12px 4px;
+    border-radius: 10px;
   }
 
   .statValue {
-    font-size: 1.25rem;
+    font-size: 1rem;
   }
 
   .statLabel {
-    font-size: 0.65rem;
-    margin-top: 4px;
+    font-size: 0.55rem;
+    margin-top: 3px;
   }
 
   /* Section */
@@ -653,19 +654,19 @@
 /* Extra small screens */
 @media (max-width: 400px) {
   .statRow {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .statTile {
-    padding: 12px 6px;
+    padding: 10px 2px;
   }
 
   .statValue {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
   }
 
   .statLabel {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
   }
 
   .headerTitle {
