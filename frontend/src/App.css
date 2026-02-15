@@ -582,22 +582,23 @@
     padding: 18px;
   }
 
-  /* Stats */
+  /* Stats - 3 columns on mobile, wrapping */
   .statRow {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
 
   .statTile {
-    padding: 16px 12px;
+    padding: 14px 8px;
   }
 
   .statValue {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .statLabel {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+    margin-top: 4px;
   }
 
   /* Section */
@@ -624,20 +625,18 @@
     font-size: 0.75rem;
   }
 
-  /* User table - horizontal scroll */
+  /* User table - horizontal scroll wrapper */
   .userTable {
     overflow-x: auto;
-    margin-left: -16px;
-    margin-right: -16px;
-    padding: 0 16px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .userTableHead,
   .userTableRow {
-    min-width: 560px;
-    font-size: 0.8rem;
-    padding: 8px 12px;
-    gap: 8px;
+    min-width: 520px;
+    font-size: 0.75rem;
+    padding: 8px 10px;
+    gap: 6px;
   }
 
   /* Footer */
@@ -655,6 +654,18 @@
 @media (max-width: 400px) {
   .statRow {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statTile {
+    padding: 12px 6px;
+  }
+
+  .statValue {
+    font-size: 1.1rem;
+  }
+
+  .statLabel {
+    font-size: 0.6rem;
   }
 
   .headerTitle {
