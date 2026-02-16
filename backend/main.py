@@ -202,7 +202,9 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                 SELECT
                     user_id,
                     BOOL_OR(event_type = 'page_view') AS visited,
-                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" IN ('pdf', 'pdf-compressed')) AS dl_pdf,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf_full,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf-compressed') AS dl_pdf_compressed,
                     BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub,
                     BOOL_OR(event_type = 'send_to_kindle_click') AS dl_kindle
                 FROM scoped
@@ -211,6 +213,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
             SELECT
                 COUNT(*) FILTER (WHERE visited)::bigint AS visited,
                 COUNT(*) FILTER (WHERE dl_pdf)::bigint AS pdf,
+                COUNT(*) FILTER (WHERE dl_pdf_full)::bigint AS pdf_full,
+                COUNT(*) FILTER (WHERE dl_pdf_compressed)::bigint AS pdf_compressed,
                 COUNT(*) FILTER (WHERE dl_epub)::bigint AS epub,
                 COUNT(*) FILTER (WHERE dl_pdf AND dl_epub)::bigint AS both,
                 COUNT(*) FILTER (WHERE dl_pdf AND NOT dl_epub)::bigint AS pdf_only,
@@ -233,7 +237,9 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                 SELECT
                     user_id,
                     BOOL_OR(event_type = 'page_view') AS visited,
-                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" IN ('pdf', 'pdf-compressed')) AS dl_pdf,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf') AS dl_pdf_full,
+                    BOOL_OR(event_type = 'download_url_issued' AND "format" = 'pdf-compressed') AS dl_pdf_compressed,
                     BOOL_OR(event_type = 'download_url_issued' AND "format" = 'epub') AS dl_epub,
                     BOOL_OR(event_type = 'send_to_kindle_click') AS dl_kindle
                 FROM scoped
@@ -246,6 +252,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
                 COALESCE(u.reward_title, '') AS reward_title,
                 p.visited,
                 p.dl_pdf,
+                p.dl_pdf_full,
+                p.dl_pdf_compressed,
                 p.dl_epub,
                 p.dl_kindle
             FROM per_user p
@@ -265,6 +273,8 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
         "user_summary": user_summary[0] if user_summary else {
             "visited": 0,
             "pdf": 0,
+            "pdf_full": 0,
+            "pdf_compressed": 0,
             "epub": 0,
             "both": 0,
             "pdf_only": 0,

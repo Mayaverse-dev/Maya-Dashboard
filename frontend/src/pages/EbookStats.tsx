@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 type UserSummary = {
   visited: number
   pdf: number
+  pdf_full: number
+  pdf_compressed: number
   epub: number
   both: number
   pdf_only: number
@@ -17,6 +19,8 @@ type UserRow = {
   reward_title: string
   visited: boolean
   dl_pdf: boolean
+  dl_pdf_full: boolean
+  dl_pdf_compressed: boolean
   dl_epub: boolean
   dl_kindle: boolean
 }
@@ -56,7 +60,7 @@ function formatTs(ts?: string) {
   }
 }
 
-type Filter = 'all' | 'visited' | 'pdf' | 'epub' | 'both' | 'kindle'
+type Filter = 'all' | 'visited' | 'pdf' | 'pdf_full' | 'pdf_compressed' | 'epub' | 'both' | 'kindle'
 
 export default function EbookStats({
   refreshSeq,
@@ -129,6 +133,8 @@ export default function EbookStats({
     // Filter by category
     if (filter === 'visited' && !u.visited) return false
     if (filter === 'pdf' && !u.dl_pdf) return false
+    if (filter === 'pdf_full' && !u.dl_pdf_full) return false
+    if (filter === 'pdf_compressed' && !u.dl_pdf_compressed) return false
     if (filter === 'epub' && !u.dl_epub) return false
     if (filter === 'both' && !(u.dl_pdf && u.dl_epub)) return false
     if (filter === 'kindle' && !u.dl_kindle) return false
@@ -167,6 +173,14 @@ export default function EbookStats({
               <div className="statValue">{s?.pdf ?? 0}</div>
               <div className="statLabel">PDF</div>
             </button>
+            <button className="statTile glassCard statBtn" type="button" onClick={() => onTileClick('pdf_full')}>
+              <div className="statValue">{s?.pdf_full ?? 0}</div>
+              <div className="statLabel">PDF Full</div>
+            </button>
+            <button className="statTile glassCard statBtn" type="button" onClick={() => onTileClick('pdf_compressed')}>
+              <div className="statValue">{s?.pdf_compressed ?? 0}</div>
+              <div className="statLabel">PDF Lite</div>
+            </button>
             <button className="statTile glassCard statBtn" type="button" onClick={() => onTileClick('epub')}>
               <div className="statValue">{s?.epub ?? 0}</div>
               <div className="statLabel">ePub</div>
@@ -198,6 +212,12 @@ export default function EbookStats({
                 <button className={`chipBtn${filter === 'pdf' ? ' active' : ''}`} type="button" onClick={() => setFilter('pdf')}>
                   PDF
                 </button>
+                <button className={`chipBtn${filter === 'pdf_full' ? ' active' : ''}`} type="button" onClick={() => setFilter('pdf_full')}>
+                  PDF Full
+                </button>
+                <button className={`chipBtn${filter === 'pdf_compressed' ? ' active' : ''}`} type="button" onClick={() => setFilter('pdf_compressed')}>
+                  PDF Lite
+                </button>
                 <button className={`chipBtn${filter === 'epub' ? ' active' : ''}`} type="button" onClick={() => setFilter('epub')}>
                   ePub
                 </button>
@@ -226,7 +246,8 @@ export default function EbookStats({
                   <span>Email</span>
                   <span>Name</span>
                   <span>Visited</span>
-                  <span>PDF</span>
+                  <span>PDF Full</span>
+                  <span>PDF Lite</span>
                   <span>ePub</span>
                   <span>Kindle</span>
                 </div>
@@ -235,7 +256,8 @@ export default function EbookStats({
                     <span className="userEmail">{u.email}</span>
                     <span>{u.name || '-'}</span>
                     <span className={u.visited ? 'yes' : 'no'}>{u.visited ? 'Yes' : '-'}</span>
-                    <span className={u.dl_pdf ? 'yes' : 'no'}>{u.dl_pdf ? 'Yes' : '-'}</span>
+                    <span className={u.dl_pdf_full ? 'yes' : 'no'}>{u.dl_pdf_full ? 'Yes' : '-'}</span>
+                    <span className={u.dl_pdf_compressed ? 'yes' : 'no'}>{u.dl_pdf_compressed ? 'Yes' : '-'}</span>
                     <span className={u.dl_epub ? 'yes' : 'no'}>{u.dl_epub ? 'Yes' : '-'}</span>
                     <span className={u.dl_kindle ? 'yes' : 'no'}>{u.dl_kindle ? 'Yes' : '-'}</span>
                   </div>

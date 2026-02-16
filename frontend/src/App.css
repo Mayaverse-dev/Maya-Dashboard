@@ -479,7 +479,7 @@
 .userTableHead,
 .userTableRow {
   display: grid;
-  grid-template-columns: 2fr 1.2fr 0.6fr 0.6fr 0.6fr 0.7fr;
+  grid-template-columns: 2fr 1.2fr 0.6fr 0.6fr 0.6fr 0.6fr 0.7fr;
   gap: 10px;
   padding: 10px 14px;
   align-items: center;
@@ -582,9 +582,9 @@
     padding: 18px;
   }
 
-  /* Stats - 5 columns on mobile to fit all */
+  /* Stats - 4 columns on mobile to fit all 7 tiles */
   .statRow {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 6px;
   }
 
@@ -634,7 +634,7 @@
 
   .userTableHead,
   .userTableRow {
-    min-width: 520px;
+    min-width: 580px;
     font-size: 0.75rem;
     padding: 8px 10px;
     gap: 6px;
