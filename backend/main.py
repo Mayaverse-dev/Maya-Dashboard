@@ -191,11 +191,13 @@ def _ebook_stats_payload(days: int) -> Dict[str, Any]:
     try:
         # User summary: how many unique users visited (page_view),
         # downloaded pdf, downloaded epub, downloaded both.
+        # Only count users that still exist in public.users.
         user_summary = db.fetch_all(
             f"""
             WITH scoped AS (
                 SELECT e.user_id, e.event_type, e."format"
                 FROM ebook.download_events e
+                JOIN public.users u ON u.id = e.user_id
                 {where_sql}
             ),
             per_user AS (
