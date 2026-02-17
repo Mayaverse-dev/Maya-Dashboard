@@ -1,8 +1,10 @@
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { ArrowLeft, LogOut, RefreshCw } from 'lucide-react'
 import EbookStats from './pages/EbookStats'
+import PledgeManagerStats from './pages/PledgeManagerStats'
 import mayaLogo from './assets/maya.webp'
 import ebookCardBg from './assets/Memory of Water.png'
+import pledgeCardBg from './assets/Fulcrum.png'
 import './App.css'
 
 type VerifyResponse = {
@@ -70,6 +72,8 @@ function App() {
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname)
   const [ebookRefreshSeq, setEbookRefreshSeq] = useState(0)
   const [ebookSyncing, setEbookSyncing] = useState(false)
+  const [pledgeRefreshSeq, setPledgeRefreshSeq] = useState(0)
+  const [pledgeSyncing, setPledgeSyncing] = useState(false)
 
   const cards: CardSpec[] = [
     {
@@ -78,6 +82,13 @@ function App() {
       description: '',
       path: '/ebook',
       backgroundSrc: ebookCardBg,
+    },
+    {
+      kind: 'internal',
+      title: 'Pledge Manager',
+      description: '',
+      path: '/pledge-manager',
+      backgroundSrc: pledgeCardBg,
     },
   ]
 
@@ -151,6 +162,26 @@ function App() {
   }
 
   const isEbookPage = currentPath === '/ebook'
+  const isPledgePage = currentPath === '/pledge-manager'
+  const isSubPage = isEbookPage || isPledgePage
+
+  const getHeaderTitle = () => {
+    if (isEbookPage) return 'eBook Stats'
+    if (isPledgePage) return 'Pledge Manager'
+    return 'Metrics'
+  }
+
+  const isSyncing = isEbookPage ? ebookSyncing : pledgeSyncing
+
+  const handleSync = () => {
+    if (isEbookPage) {
+      setEbookSyncing(true)
+      setEbookRefreshSeq((n) => n + 1)
+    } else if (isPledgePage) {
+      setPledgeSyncing(true)
+      setPledgeRefreshSeq((n) => n + 1)
+    }
+  }
 
   return (
     <div className="page bgMayaGradient">
@@ -194,10 +225,10 @@ function App() {
             <div className="container headerInner">
               <div className="headerBrand">
                 <img className="headerLogo" src={mayaLogo} alt="" aria-hidden="true" />
-                <span className="headerTitle">{isEbookPage ? 'eBook Stats' : 'Metrics'}</span>
+                <span className="headerTitle">{getHeaderTitle()}</span>
               </div>
               <div className="navActions">
-                {isEbookPage ? (
+                {isSubPage ? (
                   <>
                     <button className="btn iconBtn" type="button" onClick={() => navigate('/')} aria-label="Back">
                       <ArrowLeft size={18} />
@@ -205,14 +236,11 @@ function App() {
                     <button
                       className="btn iconBtn"
                       type="button"
-                      onClick={() => {
-                        setEbookSyncing(true)
-                        setEbookRefreshSeq((n) => n + 1)
-                      }}
-                      disabled={ebookSyncing}
+                      onClick={handleSync}
+                      disabled={isSyncing}
                       aria-label="Sync"
                     >
-                      <RefreshCw size={18} className={ebookSyncing ? 'spin' : ''} />
+                      <RefreshCw size={18} className={isSyncing ? 'spin' : ''} />
                     </button>
                   </>
                 ) : null}
@@ -230,6 +258,11 @@ function App() {
               <EbookStats
                 refreshSeq={ebookRefreshSeq}
                 onRefreshComplete={() => setEbookSyncing(false)}
+              />
+            ) : isPledgePage ? (
+              <PledgeManagerStats
+                refreshSeq={pledgeRefreshSeq}
+                onRefreshComplete={() => setPledgeSyncing(false)}
               />
             ) : (
               <div className="cardGrid">

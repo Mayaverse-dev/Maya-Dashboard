@@ -299,6 +299,52 @@ def ebook_sync(days: int = 30, payload: Dict[str, Any] = Depends(verify_maya_aut
     return _ebook_stats_payload(days)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Pledge Manager stats
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _pledge_manager_stats_payload() -> Dict[str, Any]:
+    try:
+        # Count total users
+        total_users = db.fetch_all(
+            "SELECT COUNT(*)::bigint AS count FROM public.users"
+        )
+
+        # Count users with shipping addresses (have at least one order with shipping_address)
+        users_with_address = db.fetch_all(
+            """
+            SELECT COUNT(DISTINCT o.user_id)::bigint AS count
+            FROM public.orders o
+            JOIN public.users u ON u.id = o.user_id
+            WHERE o.shipping_address IS NOT NULL AND o.shipping_address != ''
+            """
+        )
+
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Database query failed") from exc
+
+    return {
+        "ok": True,
+        "generated_at": _now_iso(),
+        "summary": {
+            "total_users": total_users[0]["count"] if total_users else 0,
+            "users_with_address": users_with_address[0]["count"] if users_with_address else 0,
+        },
+    }
+
+
+@app.get("/api/pledge-manager/stats")
+def pledge_manager_stats(payload: Dict[str, Any] = Depends(verify_maya_auth)) -> Dict[str, Any]:
+    _ = payload
+    return _pledge_manager_stats_payload()
+
+
+@app.post("/api/pledge-manager/sync")
+def pledge_manager_sync(payload: Dict[str, Any] = Depends(verify_maya_auth)) -> Dict[str, Any]:
+    _ = payload
+    return _pledge_manager_stats_payload()
+
+
 def _dist_dir() -> Path:
     # backend/main.py -> repo_root/frontend/dist
     return Path(__file__).resolve().parent.parent / "frontend" / "dist"

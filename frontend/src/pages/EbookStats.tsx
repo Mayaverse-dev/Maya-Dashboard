@@ -70,12 +70,14 @@ export default function EbookStats({
   onRefreshComplete: () => void
 }) {
   const WINDOW_DAYS = 30
+  const PAGE_SIZE = 20
 
   const [data, setData] = useState<EbookStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
 
   async function fetchStats(method: 'GET' | 'POST') {
     setError(null)
@@ -146,6 +148,18 @@ export default function EbookStats({
     }
     return true
   })
+
+  // Any time the filter/search/data changes, go back to the first page so the
+  // table doesn't "get stuck" on an out-of-range page.
+  useEffect(() => {
+    setPage(1)
+  }, [filter, search, data?.users])
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const startIdx = filteredUsers.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1
+  const endIdx = Math.min(filteredUsers.length, safePage * PAGE_SIZE)
+  const pagedUsers = filteredUsers.slice((safePage - 1) * PAGE_SIZE, (safePage - 1) * PAGE_SIZE + PAGE_SIZE)
 
   function onTileClick(next: Filter) {
     setFilter(next)
@@ -242,6 +256,43 @@ export default function EbookStats({
 
             {filteredUsers.length > 0 ? (
               <div className="userTable">
+                <div
+                  className="chipRow"
+                  style={{
+                    justifyContent: 'space-between',
+                    marginBottom: 10,
+                    gap: 10,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div className="subtle">
+                    Showing {startIdx}-{endIdx} of {filteredUsers.length}
+                  </div>
+                  <div className="chipRow" style={{ gap: 8 }}>
+                    <button
+                      className="chipBtn"
+                      type="button"
+                      disabled={safePage <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      aria-label="Previous page"
+                    >
+                      Prev
+                    </button>
+                    <div className="chip" aria-label="Current page">
+                      Page {safePage} / {totalPages}
+                    </div>
+                    <button
+                      className="chipBtn"
+                      type="button"
+                      disabled={safePage >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      aria-label="Next page"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+
                 <div className="userTableHead">
                   <span>Email</span>
                   <span>Name</span>
@@ -251,7 +302,7 @@ export default function EbookStats({
                   <span>ePub</span>
                   <span>Kindle</span>
                 </div>
-                {filteredUsers.map((u) => (
+                {pagedUsers.map((u) => (
                   <div key={u.id} className="userTableRow">
                     <span className="userEmail">{u.email}</span>
                     <span>{u.name || '-'}</span>
