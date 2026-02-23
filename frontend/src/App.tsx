@@ -5,6 +5,7 @@ import PledgeManagerStats from './pages/PledgeManagerStats'
 import mayaLogo from './assets/maya.webp'
 import ebookCardBg from './assets/Memory of Water.png'
 import pledgeCardBg from './assets/Fulcrum.png'
+import emailCardBg from './assets/Neti Neti edited.png'
 import './App.css'
 
 type VerifyResponse = {
@@ -37,7 +38,8 @@ type ExternalCard = {
   kind: 'external'
   title: string
   description: string
-  subdomain: string
+  subdomain?: string
+  url?: string
   badge?: string
   backgroundSrc?: string
 }
@@ -89,6 +91,13 @@ function App() {
       description: '',
       path: '/pledge-manager',
       backgroundSrc: pledgeCardBg,
+    },
+    {
+      kind: 'external',
+      title: 'Email Analytics',
+      description: '',
+      url: 'https://email.dashboard.entermaya.com/',
+      backgroundSrc: emailCardBg,
     },
   ]
 
@@ -288,14 +297,14 @@ function App() {
                   }
 
                   const suffix = deriveServiceSuffix()
-                  const href = suffix ? `https://${card.subdomain}.${suffix}` : '#'
-                  const disabled = !suffix
+                  const href = card.url ? card.url : (suffix && card.subdomain ? `https://${card.subdomain}.${suffix}` : '#')
+                  const disabled = !card.url && !suffix
                   const style: CSSProperties | undefined = card.backgroundSrc
                     ? ({ ['--card-bg' as any]: `url(${card.backgroundSrc})` } as CSSProperties)
                     : undefined
                   return (
                     <a
-                      key={card.subdomain}
+                      key={card.url || card.subdomain}
                       className={`appCard glassCard${card.backgroundSrc ? ' cardHasBg' : ''}`}
                       href={href}
                       target={disabled ? undefined : '_blank'}
